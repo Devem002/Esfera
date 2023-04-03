@@ -1,5 +1,9 @@
+#include <SoftwareSerial.h>
 
 
+SoftwareSerial ESP_Serial(3,2);
+
+String payload;
 
 int A1O = 10;
 int A2O = 11;
@@ -21,7 +25,7 @@ int keys[]={0,1,2,3,4,5,6,7};
 //{0,1,2,3,4,5,6,7}
 
 String inputs[] = {
-  "ADL","AIZ", "ADL"
+  
 };
 
 
@@ -86,7 +90,7 @@ int getMoveKey(String moveInput)
     }
     
   }
-  
+  return 0;
 }
 
 
@@ -112,12 +116,15 @@ void setup() {
   
   
   Serial.begin(9600);
+   ESP_Serial.begin(115200);
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
+  payload = ESP_Serial.readString();
+  Serial.println(payload);
   
   if (actionFlag)
   {
@@ -250,7 +257,7 @@ void loop() {
         analogWrite(B2O,0);
         analogWrite(A1O,0);
         analogWrite(A2O,0);
-    delay(10000);
+    delay(11000);
   }
 
 }
