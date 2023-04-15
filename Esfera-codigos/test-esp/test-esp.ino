@@ -58,9 +58,9 @@ void loop() {
       
       payload = http.getString();   // Store the value on varibale Payload for debugging
 
-    //Serial.println(payload);   //Print the payload for debugging otherwise comment both lines
+    //Serial.print(payload);   //Print the payload for debugging otherwise comment both lines
     
-    const size_t bufferSize = JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(8) + JSON_OBJECT_SIZE(12) + JSON_OBJECT_SIZE(56) + 2160;
+const size_t bufferSize = JSON_OBJECT_SIZE(0) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(2) + 2*JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(8) + JSON_OBJECT_SIZE(12) + JSON_OBJECT_SIZE(56) + 2160;
 
 DynamicJsonDocument jsonBuffer(bufferSize);
 
@@ -86,6 +86,8 @@ delay(100); //stability delay
 
     http.end();
 
+
+
 /*Phrasing Data using the JSON librarey */ //Use https://arduinojson.org/assistant/ to get the phrasing values for your JSON string 
 
 
@@ -100,6 +102,6 @@ delay(100); //stability delay
   }
   
 
-  delay(10000);    //send values to Arduino every 10 sec.
+  delay(15000);    //send values to Arduino every 10 sec.
 
 }}

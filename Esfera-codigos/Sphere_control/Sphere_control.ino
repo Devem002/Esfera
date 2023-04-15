@@ -1,7 +1,9 @@
-#include <SoftwareSerial.h>
+#include <AltSoftSerial.h>
 
+//#include <SoftwareSerial.h>
 
-SoftwareSerial ESP_Serial(3,2);
+AltSoftSerial altser;
+//SoftwareSerial ESP_Serial(3,2);
 
 String payload;
 
@@ -23,13 +25,11 @@ String movements[]={"ATR","ADL","ADE","AIZ","IZQ","DER","DDE","DIZ"};
 int keys[]={0,1,2,3,4,5,6,7};
 //{"ATR","ADL","ADE","AIZ","IZQ","DER","DDE","DIZ"}
 //{0,1,2,3,4,5,6,7}
-
-String inputs[] = {
-  
-};
+String arrayOut[20];
 
 
-bool actionFlag;
+
+bool actionFlag = false;
 
 int speed = 153;
 int currentAngle =0;
@@ -61,7 +61,7 @@ int rotate(int angleAmount){
     analogWrite(A2O,speed);
     analogWrite(B1O,speed);
     analogWrite(B2O,0);
-    delay(210*((-angleAmount)/45));
+    delay(300*((-angleAmount)/45));
     currentAngle =currentAngle+angleAmount;
     
   }
@@ -71,7 +71,7 @@ int rotate(int angleAmount){
     analogWrite(A2O,0);
     analogWrite(B1O,0);
     analogWrite(B2O,speed);
-    delay(210*(angleAmount/45));
+    delay(300*(angleAmount/45));
     currentAngle += angleAmount;
     
   }
@@ -90,8 +90,48 @@ int getMoveKey(String moveInput)
     }
     
   }
-  return 0;
+  return 9;
 }
+
+
+int waitForInput()
+{
+  if(altser.available()>0){
+    while(altser.available()>0){
+    
+      char c = altser.read();
+    payload.concat(c);
+  }
+   Serial.println(payload);
+
+  String breakPay;
+  int x = 0;
+  
+  for(int i =1; i<60;i++){
+    
+    if(!(payload[i]== ',' or payload[i]== '.' or payload[i]== ']'  or payload[i]== '[')){
+      
+         breakPay.concat(payload[i]);
+      }
+      //Serial.println(breakPay);
+    else{
+      //Serial.println(breakPay);
+      arrayOut[x] = breakPay;
+      x += 1;
+      breakPay.remove(0);
+      //Serial.println("cleaned String");
+    }
+    }
+   
+   actionFlag = true;
+   
+}else{
+  delay(15000);
+}
+
+}
+  
+
 
 
 void setup() {
@@ -108,43 +148,39 @@ void setup() {
   digitalWrite(A1O,LOW);
   digitalWrite(A2O,LOW);
 
-  if(sizeof(inputs)!=0){
-    actionFlag = true;
-  }else{
-    actionFlag = false;
-    }
-  
-  
   Serial.begin(9600);
-   ESP_Serial.begin(115200);
+  altser.begin(115200);
+   //ESP_Serial.begin(9600);
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-  payload = ESP_Serial.readString();
-  Serial.println(payload);
+   
+  
   
   if (actionFlag)
   {
     
-    for(int i=0;i<sizeof(inputs)/6;i++) //size of inputs is the ammount of strings * 6, why? idk
+  
+  
+  
+    for(int i=0;i<20;i++) //size of inputs is the ammount of strings * 6, why? idk
     {
            
             Serial.print("input=  ");
-            Serial.println(inputs[i]);
-            Serial.print("moveKey=  ");
-            Serial.println(getMoveKey(inputs[i]));
+            Serial.println(arrayOut[i]);
+//            Serial.print("moveKey=  ");
+//            Serial.println(getMoveKey(arrayOut[i]));
 
-       switch(getMoveKey(inputs[i]))
+       switch(getMoveKey(arrayOut[i]))
        {
             
             
         case 0:
           {
-            Serial.print("case=");
-            Serial.println("ATR");
+           
             setAngle(0);
             analogWrite(A1O,0);
             analogWrite(A2O,speed);
@@ -156,8 +192,8 @@ void loop() {
          };
          case 1:
           {
-            Serial.print("case=");
-            Serial.println("ADL");
+            
+
             setAngle(0);
             analogWrite(A1O,speed);
             analogWrite(A2O,0);
@@ -169,8 +205,7 @@ void loop() {
           };
           case 2:
           {
-            Serial.print("case=");
-            Serial.println("ADE");
+           
             setAngle(45);
             analogWrite(A1O,speed);
             analogWrite(A2O,0);
@@ -182,8 +217,7 @@ void loop() {
          };
           case 3:
           {
-            Serial.print("case=");
-            Serial.println("AIZ");
+           
             setAngle(145);
             analogWrite(A1O,0);
             analogWrite(A2O,speed);
@@ -195,8 +229,7 @@ void loop() {
          };
          case 4:
           {
-            Serial.print("case=");
-            Serial.println("IZQ");
+          
             setAngle(90);
             analogWrite(A1O,0);
             analogWrite(A2O,speed);
@@ -208,8 +241,7 @@ void loop() {
          };
          case 5:
           {
-            Serial.print("case=");
-            Serial.println("DER");
+            
             setAngle(90);
             analogWrite(A1O,speed);
             analogWrite(A2O,0);
@@ -221,8 +253,7 @@ void loop() {
          };
          case 6:
           {
-            Serial.print("case=");
-            Serial.println("DDE");
+            
             setAngle(145);
             analogWrite(A1O,speed);
             analogWrite(A2O,0);
@@ -234,8 +265,7 @@ void loop() {
          };
          case 7:
           {
-            Serial.print("case=");
-            Serial.println("DIZ");
+           
             setAngle(45);
             analogWrite(A1O,0);
             analogWrite(A2O,speed);
@@ -246,18 +276,27 @@ void loop() {
           break;
          };
          default:
-         Serial.println("Case error!");
+         break;
+         //Serial.println("Case error!");
       } 
     }
+    analogWrite(B1O,0);
+        analogWrite(B2O,0);
+        analogWrite(A1O,0);
+        analogWrite(A2O,0);
+    delay(3000);
+    setAngle(0);
     actionFlag = false;
-    
-    
-  }else{
+  }
+  
+
+
+else{
         analogWrite(B1O,0);
         analogWrite(B2O,0);
         analogWrite(A1O,0);
         analogWrite(A2O,0);
-    delay(11000);
-  }
-
+    waitForInput();
+    
+    }
 }

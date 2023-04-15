@@ -1,0 +1,41 @@
+-- Codigo de prueba para el analizador sintactico
+
+
+
+Def(@piporin , Integer ,(1+2)/3); 
+
+
+
+Proc @proceso(
+    Def(@var#2 , Boolean, False); 
+    Mover(ATR);
+    =>("var#2 = ");
+    =>(@var#2);
+    Not(@var#2);
+    =>("var#2 = ");
+    =>(@var#2);
+    
+);
+
+
+Aleatorio();
+
+While @piporin < 10 (
+    Alter(@piporin,1);
+);
+
+=>(@piporin);
+
+Def(@case1,Boolean,True);
+
+Case When(@case1) Then (
+    Not(@case1);
+    );
+
+Def(@case2,Boolean,False);
+
+Case @case2 When False Then(
+    =>("@case2 False");
+) Else(
+    =>("@case2 True");
+);
